@@ -1,6 +1,6 @@
 # bitquery_dex
      Minimal Python sample script to get Binance Smart Chain (BSC) token price expressed in BUSD, 
-     using only data from dex liquidity pools, with the help of Bitquery API.
+     using only data from dex liquidity pools, employing Bitquery API.
      
      To get Bitquery API key register as "Developer" at https://bitquery.io/
      FREE plan limits:

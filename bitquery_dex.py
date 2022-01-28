@@ -15,46 +15,52 @@ API_KEY = "YOUR___API___KEY___HERE"
 BASE_URL = "https://graphql.bitquery.io/"
 
 
-token_list = {"CAKE": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+# change required token contract address and name:
+token_name = "CAKE"
+token_list = {"TOKEN": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
               "BUSD": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
               "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"}
 
-# "token_list" is not used and is here only for reference.
-# To receive price data for different token edit baseCurrency contract address in the "query" bellow
+
 
 query = """
-{
+ query getData($base0: String, $base1: String, $quote0: String){
   ethereum(network: bsc) {
-    cakePrice: dexTrades(
-      baseCurrency: {is: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"}
-      quoteCurrency: {is: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"}
+    tokenPrice: dexTrades(
+      baseCurrency: {is: $base0}
+      quoteCurrency: {is: $quote0}
     ) {
       quotePrice
     }
     busdPrice: dexTrades(
-      baseCurrency: {is: "0xe9e7cea3dedca5984780bafc599bd69add087d56"}
-      quoteCurrency: {is: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"}
+      baseCurrency: {is: $base1}
+      quoteCurrency: {is: $quote0}
     ) {
       quotePrice
     }
   }
 }
 """
+params = {
+  "base0"  : token_list["TOKEN"],
+  "base1"  : token_list["BUSD"],
+  "quote0" : token_list["WBNB"]
+}
 
-json     = {"query"     : query}
+json     = {"query"     : query, "variables": params}
 headers  = {"X-API-KEY" : API_KEY}
 
 while True:
   response = requests.post(BASE_URL, json = json, headers = headers)
   if response.status_code == 200:
     jsonResp = response.json()
-    cakeBNBprice = jsonResp['data']['ethereum']['cakePrice'][0]['quotePrice']
+    tokenBNBprice = jsonResp['data']['ethereum']['tokenPrice'][0]['quotePrice']
     busdBNBprice = jsonResp['data']['ethereum']['busdPrice'][0]['quotePrice']
-    cakeBUSDprice = float(cakeBNBprice) / float(busdBNBprice)
+    tokenBUSDprice = float(tokenBNBprice) / float(busdBNBprice)
 
     timeNow = datetime.datetime.now()
     timeStampStr = timeNow.strftime("[%d-%b-%Y %H:%M:%S]")
-    print(timeStampStr," $CAKE price in WBNB: ", "{:.12f}".format(cakeBNBprice), ";  $CAKE price in BUSD: ", "{:.12f}".format(cakeBUSDprice))
+    print(timeStampStr+" $"+token_name+" price in WBNB: "+"{:.12f}".format(tokenBNBprice)+";  $"+token_name+" price in BUSD: "+"{:.12f}".format(tokenBUSDprice))
 
   else:
     error = (f"Query failed and return code is {response.status_code}. {query}")
@@ -62,6 +68,3 @@ while True:
 
   # wait 10 seconds to save API calls
   time.sleep(10)
-
-
-

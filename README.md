@@ -1,5 +1,5 @@
 # bitquery_dex
-     Minimal Python sample script to get Binance Smart Chain (BSC) token price expressed in BUSD, 
+     Minimal Python sample script to get Binance Smart Chain (BSC) DeFi token (BEP20/ERC20) price expressed in BUSD, 
      using only data from dex liquidity pools, employing Bitquery API.
      
      To get Bitquery API key register as "Developer" at https://bitquery.io/
